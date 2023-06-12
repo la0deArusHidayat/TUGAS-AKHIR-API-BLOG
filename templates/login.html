@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .success-popup {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .error-popup {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+    <script>
+        function redirect() {
+            window.location.href = '/daftar_artikel';
+        }
+
+        function showPopup(popupId, message) {
+            var popup = document.getElementById(popupId);
+            popup.innerHTML = message;
+            popup.style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <h1>Login</h1>
+    <form action="/api/login" method="POST" onsubmit="event.preventDefault(); login()">
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <input type="submit" value="Login">
+    </form>
+    <div id="success-popup" class="popup success-popup"></div>
+    <div id="error-popup" class="popup error-popup"></div>
+    <script>
+        function login() {
+            var form = document.querySelector('form');
+            var formData = new FormData(form);
+
+            fetch('/api/login', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.popup === "error") {
+                    showPopup("error-popup", data.msg);
+                } else {
+                    showPopup("success-popup", "Login sukses!");
+                    setTimeout(redirect, 2000); // Redirect after 2 seconds
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showPopup("error-popup", "Terjadi kesalahan.");
+            });
+        }
+    </script>
+</body>
+</html>
